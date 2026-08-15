@@ -1,13 +1,14 @@
 ---
-name: mermaid-excalidraw
-description: Convert Mermaid.js diagrams in markdown blogs and docs into hand-drawn PNG or SVG images. Use when a file has mermaid fences, the user wants sketch-style diagrams for a blog, or they ask to export mermaid.js embeddings as uploadable images.
-license: MIT
+name: mermaid-excalidraw-skill
+description: Convert Mermaid.js fences in markdown blogs and docs into hand-drawn PNG or SVG images for upload. Use when a post has mermaid blocks, the user wants sketch-style diagrams, or they ask to replace mermaid.js embeddings with images.
+license: GPL-3.0
 metadata:
-  version: "1.1.0"
+  version: "1.0.0"
   author: anxkhn
+  tags: mermaid, mermaidjs, diagrams, markdown, blog, documentation, agent-skills
 ---
 
-# Mermaid to sketch images
+# mermaid-excalidraw-skill
 
 Turn ` ```mermaid ` blocks into hand-drawn images a blog or static site can upload. GitHub can render Mermaid natively. Most blogs cannot.
 
@@ -35,9 +36,7 @@ Defaults when they say nothing extra: white background, PNG, `images/` beside th
 python3 scripts/convert.py /path/to/post.md
 ```
 
-Images land in `/path/to/images/diagram-sequence-1.png` and similar names. The person publishing the blog can upload that folder with the post.
-
-Custom output dir and look:
+Images land in `/path/to/images/diagram-sequence-1.png` and similar names. Upload that folder with the post.
 
 ```bash
 python3 scripts/convert.py /path/to/post.md --out-dir /path/to/images --bg transparent --font-size 18
@@ -77,4 +76,4 @@ python3 scripts/convert.py --input - --output diagram.svg --format svg --bg tran
 
 ## Notes
 
-The script prepends Mermaid `look: handDrawn` so the images look sketched. It calls mermaid.ink and needs network access. Requires Python 3 only. No npm install.
+The script prepends Mermaid `look: handDrawn` so the images look sketched. It calls mermaid.ink and needs network access. Requires Python 3 only.

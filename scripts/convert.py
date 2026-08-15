@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (C) 2026 Anas Khan
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Render Mermaid diagrams as sketch-style PNG or SVG images."""
 
 from __future__ import annotations

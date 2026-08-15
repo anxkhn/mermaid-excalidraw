@@ -1,6 +1,6 @@
-# mermaid-excalidraw
+# mermaid-excalidraw-skill
 
-[![skills.sh installs](https://skills.sh/b/anxkhn/mermaid-excalidraw)](https://skills.sh/anxkhn/mermaid-excalidraw)
+[![skills.sh](https://skills.sh/b/anxkhn/mermaid-excalidraw-skill)](https://skills.sh/anxkhn/mermaid-excalidraw-skill)
 
 A portable [agent skill](https://agentskills.io) that turns Mermaid diagrams in a markdown blog or doc into hand-drawn PNG or SVG images you can upload with the post.
 
@@ -9,16 +9,16 @@ Works in any harness that loads `SKILL.md` (Claude Code, Codex, Cursor, OpenCode
 ## Install
 
 ```bash
-npx skills add anxkhn/mermaid-excalidraw
+npx skills add anxkhn/mermaid-excalidraw-skill
 ```
 
-Or clone it into whatever skills directory your agent uses:
+Global install, including the `/mermaid-excalidraw-skill` command in Claude Code:
 
 ```bash
-git clone https://github.com/anxkhn/mermaid-excalidraw.git
+npx skills add anxkhn/mermaid-excalidraw-skill -g -a claude-code -a opencode -y
 ```
 
-Then say something like: "convert the mermaid diagrams in blog.md" or "export these mermaid blocks as transparent PNGs".
+Then say "convert the mermaid diagrams in blog.md" or type `/mermaid-excalidraw-skill`.
 
 ## Script
 
@@ -34,4 +34,4 @@ Default: write PNGs into `images/` next to the markdown file and leave the merma
 
 ## License
 
-MIT
+[GNU GPLv3](LICENSE)
