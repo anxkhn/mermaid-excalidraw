@@ -1,41 +1,55 @@
 ---
 name: mermaid-excalidraw
-description: Convert Mermaid.js diagrams in GitHub-flavored markdown blogs and docs into hand-drawn Excalidraw PNG or SVG images. Use when a markdown file has mermaid fences, the user wants Excalidraw-style diagrams, or they ask to replace mermaid.js embeddings with images.
+description: Convert Mermaid.js diagrams in markdown blogs and docs into hand-drawn PNG or SVG images. Use when a file has mermaid fences, the user wants sketch-style diagrams for a blog, or they ask to export mermaid.js embeddings as uploadable images.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   author: anxkhn
 ---
 
-# Mermaid to Excalidraw
+# Mermaid to sketch images
 
-Turn ` ```mermaid ` fences into Excalidraw-style images for blogs and documentation. GitHub can render Mermaid natively. Many blog engines and static sites cannot, and the Excalidraw look reads as more hand-drawn.
+Turn ` ```mermaid ` blocks into hand-drawn images a blog or static site can upload. GitHub can render Mermaid natively. Most blogs cannot.
 
-Do not reimplement the converter. Run the script in this skill.
+Do not reimplement the renderer. Run `scripts/convert.py`.
 
-## Setup
+## How to behave
 
-From this skill directory, install dependencies once:
+Read the user's request in natural language and map it onto the script. Do not ask for flags unless something required is missing.
+
+- "convert the mermaid in this blog" → write PNGs next to the post
+- "make them transparent" → `--bg transparent`
+- "white background" → `--bg white` (this is the default)
+- "bigger labels" / "font size 22" → `--font-size 22`
+- "dark text" / "font color #111" → `--font-color '#111111'`
+- "SVG" → `--format svg`
+- "put them in assets/" → `--out-dir assets`
+- "replace the mermaid in the file" → add `--replace`
+- If they do not ask to rewrite the markdown, only write image files
+
+Defaults when they say nothing extra: white background, PNG, `images/` beside the markdown file, leave the mermaid fences alone.
+
+## Convert a blog or doc
 
 ```bash
-npm install
+python3 scripts/convert.py /path/to/post.md
 ```
 
-The script uses system Google Chrome when available. If launch fails:
+Images land in `/path/to/images/diagram-sequence-1.png` and similar names. The person publishing the blog can upload that folder with the post.
+
+Custom output dir and look:
 
 ```bash
-npx playwright install chromium
+python3 scripts/convert.py /path/to/post.md --out-dir /path/to/images --bg transparent --font-size 18
 ```
 
-## Convert a markdown file
-
-This is the usual blog or docs path. It finds every mermaid fence and writes images next to the file.
+Only rewrite the markdown if they asked:
 
 ```bash
-node scripts/convert.mjs --markdown /path/to/post.md --out-dir /path/to/images --replace
+python3 scripts/convert.py /path/to/post.md --replace
 ```
 
-`--replace` swaps each fence for an image reference and keeps the Mermaid source in an HTML comment:
+That swaps each fence for:
 
 ```markdown
 <!-- mermaid
@@ -46,44 +60,21 @@ flowchart TD
 ![flowchart diagram](images/diagram-flowchart-1.png)
 ```
 
-Preview without rewriting the markdown:
-
-```bash
-node scripts/convert.mjs --markdown /path/to/post.md --out-dir /path/to/images
-```
-
 ## Convert one diagram
 
 ```bash
-node scripts/convert.mjs diagram.mmd -o diagram.png
-node scripts/convert.mjs --input - --output diagram.svg --format svg
+python3 scripts/convert.py --input diagram.mmd --output diagram.png
+python3 scripts/convert.py --input - --output diagram.svg --format svg --bg transparent
 ```
-
-## Options
-
-| Flag | Default | Notes |
-| --- | --- | --- |
-| `--background` | `white` | `transparent`, `white`, or `#hex` |
-| `--font-size` | `20` | Label size in px |
-| `--font-color` | Excalidraw default | For example `#1e1e1e` |
-| `--format` | from output ext | `png`, `svg`, or `excalidraw` |
-| `--scale` | `2` | PNG scale |
-| `--prefix` | `diagram` | Markdown image filename prefix |
-| `--no-keep-source` | off | Drop the HTML comment when replacing |
 
 ## Workflow
 
-1. Read the markdown and list mermaid fences.
-2. Choose an image directory near the post, usually `images/` next to the file.
-3. Run `scripts/convert.mjs --markdown ... --replace`.
-4. Check the generated images with the file reader.
-5. Leave mermaid source in the HTML comment unless the user asks to delete it.
-6. Do not invent new diagram content. Convert the mermaid that is already there.
+1. Find mermaid fences in the file the user pointed at.
+2. Decide `--bg`, `--font-size`, `--font-color`, `--format`, and `--out-dir` from what they said.
+3. Run `scripts/convert.py` from this skill folder.
+4. Tell them where the images were written so they can upload them with the blog.
+5. Do not invent new diagram content. Convert the mermaid that is already there.
 
-## Supported diagrams
+## Notes
 
-Native Excalidraw shapes: flowchart, sequence, state, class, ER. Other Mermaid types fall back to an embedded Mermaid image inside the Excalidraw export.
-
-## Paths
-
-Resolve `scripts/convert.mjs` from this skill folder, not from the user's project root.
+The script prepends Mermaid `look: handDrawn` so the images look sketched. It calls mermaid.ink and needs network access. Requires Python 3 only. No npm install.
