@@ -6,16 +6,14 @@
 from __future__ import annotations
 
 import argparse
-import base64
-import json
 import os
 import re
+import shutil
+import subprocess
 import sys
-import urllib.error
-import urllib.parse
-import urllib.request
-import zlib
 from pathlib import Path
+
+SKILL_ROOT = Path(__file__).resolve().parent.parent
 
 FENCE_RE = re.compile(r"```mermaid[^\n]*\n(.*?)```", re.S)
 KIND_RE = re.compile(r"^(sequenceDiagram|stateDiagram(?:-v2)?|classDiagram|erDiagram|gantt|pie|gitGraph|flowchart|graph)\b", re.I)
@@ -69,72 +67,45 @@ def diagram_kind(definition: str) -> str:
     return "diagram"
 
 
-def with_style(definition: str, font_size: int | None, font_color: str | None) -> str:
-    if definition.lstrip().startswith("---"):
-        return definition
+def ensure_renderer() -> None:
+    if (SKILL_ROOT / "node_modules" / "playwright").exists():
+        return
+    npm = shutil.which("npm")
+    if not npm:
+        raise SystemExit("Node.js and npm are required. Install them, then run npm install in the skill folder.")
+    subprocess.run([npm, "install"], cwd=SKILL_ROOT, check=True)
 
-    config = [
-        "---",
-        "config:",
-        "  look: handDrawn",
-        "  theme: default",
+
+def render(definition: str, output: Path, *, fmt: str, background: str, font_size: int | None, font_color: str | None) -> None:
+    ensure_renderer()
+    node = shutil.which("node")
+    if not node:
+        raise SystemExit("Node.js is required to render Excalidraw diagrams.")
+    command = [
+        node,
+        str(SKILL_ROOT / "scripts" / "render.mjs"),
+        "--input",
+        "-",
+        "--output",
+        str(output),
+        "--format",
+        fmt,
+        "--bg",
+        background,
     ]
-    variables = []
     if font_size:
-        variables.append(f"    fontSize: {font_size}px")
+        command.extend(["--font-size", str(font_size)])
     if font_color:
-        variables.append(f"    primaryTextColor: '{font_color}'")
-    if variables:
-        config.append("  themeVariables:")
-        config.extend(variables)
-    config.append("---")
-    return "\n".join(config) + "\n" + definition
-
-
-def encode_diagram(definition: str) -> str:
-    payload = json.dumps(
-        {
-            "code": definition,
-            "mermaid": {"theme": "default", "look": "handDrawn"},
-        }
+        command.extend(["--font-color", font_color])
+    result = subprocess.run(
+        command,
+        input=definition.encode("utf-8"),
+        cwd=SKILL_ROOT,
+        capture_output=True,
     )
-    compressed = zlib.compress(payload.encode("utf-8"), 9)
-    return base64.urlsafe_b64encode(compressed).decode("ascii").rstrip("=")
-
-
-def bg_query(background: str) -> str:
-    if background == "transparent":
-        return "transparent"
-    if background == "white":
-        return "!white"
-    if background.startswith("#"):
-        return "!" + background[1:]
-    return "!" + background
-
-
-def render(definition: str, *, fmt: str, background: str) -> bytes:
-    encoded = encode_diagram(definition)
-    path = "svg" if fmt == "svg" else "img"
-    query = {"bgColor": bg_query(background)}
-    if fmt == "png":
-        query["type"] = "png"
-    url = f"https://mermaid.ink/{path}/pako:{encoded}?{urllib.parse.urlencode(query)}"
-    request = urllib.request.Request(
-        url,
-        headers={"User-Agent": "mermaid-excalidraw/1.0"},
-    )
-    try:
-        with urllib.request.urlopen(request, timeout=60) as response:
-            return response.read()
-    except urllib.error.HTTPError as error:
-        detail = error.read().decode("utf-8", "replace")[:300]
-        raise SystemExit(f"Render failed ({error.code}): {detail}") from error
-
-
-def write_image(path: Path, data: bytes) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(data)
-    print(path)
+    if result.returncode != 0:
+        detail = (result.stderr or result.stdout).decode("utf-8", "replace").strip()
+        raise SystemExit(detail or "Renderer failed")
 
 
 def convert_markdown(args: argparse.Namespace) -> None:
@@ -153,8 +124,15 @@ def convert_markdown(args: argparse.Namespace) -> None:
         counts[kind] = counts.get(kind, 0) + 1
         filename = f"{args.prefix}-{kind}-{counts[kind]}.{args.format}"
         output = out_dir / filename
-        styled = with_style(definition, args.font_size, args.font_color)
-        write_image(output, render(styled, fmt=args.format, background=args.bg))
+        render(
+            definition,
+            output,
+            fmt=args.format,
+            background=args.bg,
+            font_size=args.font_size,
+            font_color=args.font_color,
+        )
+        print(output)
         rel = os.path.relpath(output, markdown_path.parent).replace(os.sep, "/")
         replacements.append((definition, rel))
 
@@ -184,8 +162,15 @@ def convert_single(args: argparse.Namespace) -> None:
         raise SystemExit("Mermaid input is empty")
 
     output = Path(args.output).expanduser() if args.output else Path(f"diagram.{args.format}")
-    styled = with_style(definition, args.font_size, args.font_color)
-    write_image(output, render(styled, fmt=args.format, background=args.bg))
+    render(
+        definition,
+        output,
+        fmt=args.format,
+        background=args.bg,
+        font_size=args.font_size,
+        font_color=args.font_color,
+    )
+    print(output)
 
 
 def main() -> None:

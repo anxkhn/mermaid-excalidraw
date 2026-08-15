@@ -2,7 +2,7 @@
 
 [![skills.sh](https://skills.sh/b/anxkhn/mermaid-excalidraw-skill)](https://skills.sh/anxkhn/mermaid-excalidraw-skill)
 
-A portable [agent skill](https://agentskills.io) that turns Mermaid diagrams in a markdown blog or doc into PNG or SVG images. The default look is Mermaid handDrawn: sketchy boxes, lines, and font.
+A portable [agent skill](https://agentskills.io) that turns Mermaid diagrams in a markdown blog or doc into Excalidraw-style PNG or SVG images. Boxes, lines, and text are hand-drawn by default.
 
 Works in any harness that loads `SKILL.md` (Claude Code, Codex, Cursor, OpenCode, and others).
 
@@ -22,7 +22,13 @@ Then say "convert the mermaid diagrams in blog.md" or type `/mermaid-excalidraw-
 
 ## Script
 
-The skill runs `scripts/convert.py`. Python 3 only. No extra packages.
+The skill runs `scripts/convert.py`. Once in the skill folder:
+
+```bash
+npm install
+```
+
+Needs Node.js and Google Chrome.
 
 ```bash
 python3 scripts/convert.py blog.md

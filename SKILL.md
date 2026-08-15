@@ -10,7 +10,7 @@ metadata:
 
 # mermaid-excalidraw-skill
 
-Turn ` ```mermaid ` blocks into images a blog or static site can upload. GitHub can render Mermaid natively. Most blogs cannot. Default look is Mermaid `handDrawn`: sketchy boxes, lines, and the hand-drawn font.
+Turn ` ```mermaid ` blocks into images a blog or static site can upload. GitHub can render Mermaid natively. Most blogs cannot. Default look is Excalidraw: hand-drawn boxes, lines, and font.
 
 Do not reimplement the renderer. Run `scripts/convert.py`.
 
@@ -76,4 +76,4 @@ python3 scripts/convert.py --input - --output diagram.svg --format svg --bg tran
 
 ## Notes
 
-The script renders with Mermaid `look: handDrawn` so boxes, lines, and text are sketchy by default. It calls mermaid.ink and needs network access. Requires Python 3 only.
+The script converts Mermaid to Excalidraw elements, so boxes, lines, and text are hand-drawn by default. First run: `npm install` in this skill folder. Needs Node.js and Google Chrome.

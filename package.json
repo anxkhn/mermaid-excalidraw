@@ -1,0 +1,13 @@
+{
+  "name": "mermaid-excalidraw-skill",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@excalidraw/excalidraw": "^0.18.1",
+    "@excalidraw/mermaid-to-excalidraw": "^2.2.2",
+    "esbuild": "^0.25.12",
+    "playwright": "^1.58.2"
+  }
+}
