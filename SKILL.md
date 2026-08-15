@@ -1,6 +1,6 @@
 ---
 name: mermaid-excalidraw-skill
-description: Convert Mermaid.js fences in markdown blogs and docs into hand-drawn PNG or SVG images for upload. Use when a post has mermaid blocks, the user wants sketch-style diagrams, or they ask to replace mermaid.js embeddings with images.
+description: Convert Mermaid.js fences in markdown blogs and docs into PNG or SVG images using Mermaid's own theme and fonts. Use when a post has mermaid blocks or the user asks to export mermaid embeddings as uploadable images.
 license: GPL-3.0
 metadata:
   version: "1.0.0"
@@ -10,7 +10,7 @@ metadata:
 
 # mermaid-excalidraw-skill
 
-Turn ` ```mermaid ` blocks into hand-drawn images a blog or static site can upload. GitHub can render Mermaid natively. Most blogs cannot.
+Turn ` ```mermaid ` blocks into images a blog or static site can upload. GitHub can render Mermaid natively. Most blogs cannot. The images use Mermaid's default theme and fonts.
 
 Do not reimplement the renderer. Run `scripts/convert.py`.
 
@@ -76,4 +76,4 @@ python3 scripts/convert.py --input - --output diagram.svg --format svg --bg tran
 
 ## Notes
 
-The script prepends Mermaid `look: handDrawn` so the images look sketched. It calls mermaid.ink and needs network access. Requires Python 3 only.
+The script renders with Mermaid's default theme and fonts. It calls mermaid.ink and needs network access. Requires Python 3 only.

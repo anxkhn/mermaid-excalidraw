@@ -79,8 +79,7 @@ def with_style(definition: str, font_size: int, font_color: str | None) -> str:
         body = (
             "---\n"
             "config:\n"
-            "  look: handDrawn\n"
-            "  theme: neutral\n"
+            "  theme: default\n"
             "  themeVariables:\n"
             + "\n".join(variables)
             + "\n---\n"
@@ -90,7 +89,7 @@ def with_style(definition: str, font_size: int, font_color: str | None) -> str:
 
 
 def encode_diagram(definition: str) -> str:
-    payload = json.dumps({"code": definition, "mermaid": {"theme": "neutral"}})
+    payload = json.dumps({"code": definition, "mermaid": {"theme": "default"}})
     compressed = zlib.compress(payload.encode("utf-8"), 9)
     return base64.urlsafe_b64encode(compressed).decode("ascii").rstrip("=")
 

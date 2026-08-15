@@ -2,7 +2,7 @@
 
 [![skills.sh](https://skills.sh/b/anxkhn/mermaid-excalidraw-skill)](https://skills.sh/anxkhn/mermaid-excalidraw-skill)
 
-A portable [agent skill](https://agentskills.io) that turns Mermaid diagrams in a markdown blog or doc into hand-drawn PNG or SVG images you can upload with the post.
+A portable [agent skill](https://agentskills.io) that turns Mermaid diagrams in a markdown blog or doc into PNG or SVG images using Mermaid's own theme and fonts.
 
 Works in any harness that loads `SKILL.md` (Claude Code, Codex, Cursor, OpenCode, and others).
 
