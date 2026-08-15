@@ -31,7 +31,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--out-dir", help="Directory for markdown images (default: images/)")
     parser.add_argument("--prefix", default="diagram", help="Filename prefix")
     parser.add_argument("--bg", default="white", help="white, transparent, or #hex")
-    parser.add_argument("--font-size", type=int, default=16, dest="font_size")
+    parser.add_argument("--font-size", type=int, default=None, dest="font_size")
     parser.add_argument("--font-color", default=None, dest="font_color")
     parser.add_argument("--format", choices=("png", "svg"), default="png")
     parser.add_argument(
@@ -69,27 +69,35 @@ def diagram_kind(definition: str) -> str:
     return "diagram"
 
 
-def with_style(definition: str, font_size: int, font_color: str | None) -> str:
+def with_style(definition: str, font_size: int | None, font_color: str | None) -> str:
     if definition.lstrip().startswith("---"):
-        body = definition
-    else:
-        variables = [f"    fontSize: {font_size}px"]
-        if font_color:
-            variables.append(f"    primaryTextColor: '{font_color}'")
-        body = (
-            "---\n"
-            "config:\n"
-            "  theme: default\n"
-            "  themeVariables:\n"
-            + "\n".join(variables)
-            + "\n---\n"
-            + definition
-        )
-    return body
+        return definition
+
+    config = [
+        "---",
+        "config:",
+        "  look: handDrawn",
+        "  theme: default",
+    ]
+    variables = []
+    if font_size:
+        variables.append(f"    fontSize: {font_size}px")
+    if font_color:
+        variables.append(f"    primaryTextColor: '{font_color}'")
+    if variables:
+        config.append("  themeVariables:")
+        config.extend(variables)
+    config.append("---")
+    return "\n".join(config) + "\n" + definition
 
 
 def encode_diagram(definition: str) -> str:
-    payload = json.dumps({"code": definition, "mermaid": {"theme": "default"}})
+    payload = json.dumps(
+        {
+            "code": definition,
+            "mermaid": {"theme": "default", "look": "handDrawn"},
+        }
+    )
     compressed = zlib.compress(payload.encode("utf-8"), 9)
     return base64.urlsafe_b64encode(compressed).decode("ascii").rstrip("=")
 
